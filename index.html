@@ -54,6 +54,7 @@
     transition: background .35s ease, box-shadow .35s ease;
   }
 
+  /* ===== ШАПКА ===== */
   .header {
     padding: 50px 24px 12px;
     display: flex; justify-content: space-between; align-items: center;
@@ -83,12 +84,61 @@
   .header .chat-title .st { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
   .header .chat-title .st.online { color: var(--like-bg); }
 
+  /* ===== ЭКРАНЫ ===== */
   .screen { flex: 1; display: none; flex-direction: column; min-height: 0; }
   .screen.active { display: flex; }
 
-  /* ---------- ПОИСК ---------- */
+  /* ===== СЕГМЕНТИРОВАННЫЙ ПЕРЕКЛЮЧАТЕЛЬ ===== */
+  .search-switcher-wrap { padding: 4px 16px 10px; flex-shrink: 0; }
+  .search-switcher {
+    position: relative;
+    display: flex;
+    background: var(--card);
+    border-radius: 100px;
+    padding: 4px;
+    border: 1px solid var(--border);
+    transition: background .35s, border-color .35s;
+    overflow: hidden;
+  }
+  .search-switcher .indicator {
+    position: absolute;
+    top: 4px; left: 4px;
+    width: calc(50% - 4px);
+    height: calc(100% - 8px);
+    background: var(--accent);
+    border-radius: 100px;
+    transition: transform .3s cubic-bezier(.34,1.56,.64,1), background .35s;
+    box-shadow: 0 4px 14px var(--accent-soft);
+    z-index: 1;
+  }
+  /* Индикатор уезжает вправо, когда активна правая кнопка «Радар» */
+  .search-switcher.mode-radar .indicator { transform: translateX(100%); }
+  .search-switcher button {
+    flex: 1;
+    position: relative;
+    z-index: 2;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 9px 6px;
+    border-radius: 100px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: color .25s;
+  }
+  .search-switcher button.active { color: #fff; }
+  .search-switcher button .ico { font-size: 14px; }
+
+  /* ===== ПАНЕЛИ РЕЖИМОВ ===== */
+  .mode-pane { flex: 1; display: none; flex-direction: column; min-height: 0; }
+  .mode-pane.active { display: flex; }
+
+  /* ===== РАДАР ===== */
   .radar {
-    position: relative; flex: 1; margin: 8px 16px; border-radius: 28px;
+    position: relative; flex: 1; margin: 0 16px 8px; border-radius: 28px;
     background:
       radial-gradient(circle at 50% 45%, var(--accent-soft) 0%, transparent 55%),
       repeating-radial-gradient(circle at 50% 45%, transparent 0 58px, var(--chip) 58px 60px),
@@ -259,6 +309,118 @@
     100% { opacity: 1; transform: translateY(0) scale(1); }
   }
 
+  /* ===== КАРТА / РАДИУС ===== */
+  .radius-pane { flex: 1; overflow-y: auto; padding: 4px 16px 12px; scrollbar-width: none; }
+  .radius-pane::-webkit-scrollbar { display: none; }
+
+  .radius-map {
+    height: 240px; border-radius: 28px;
+    background:
+      radial-gradient(circle at 50% 50%, var(--accent-soft) 0%, transparent 60%),
+      repeating-radial-gradient(circle at 50% 50%, transparent 0 42px, var(--chip) 42px 44px),
+      var(--card);
+    position: relative; overflow: hidden; margin-bottom: 14px;
+    border: 1px solid var(--border);
+  }
+  .radius-map::before {
+    content: ""; position: absolute;
+    top: 50%; left: 50%; width: 110px; height: 110px;
+    margin: -55px 0 0 -55px; border-radius: 50%;
+    border: 2px dashed var(--accent); opacity: .5;
+    animation: pulse 4s ease-out infinite;
+  }
+  .radius-map::after {
+    content: ""; position: absolute; top: 50%; left: 50%;
+    width: 48px; height: 48px; margin: -24px 0 0 -24px;
+    border-radius: 50%; background: url('https://i.pravatar.cc/150?img=12') center/cover;
+    border: 3px solid var(--accent); box-shadow: 0 4px 14px var(--shadow);
+    z-index: 2;
+  }
+  .radius-map .dot {
+    position: absolute; width: 10px; height: 10px;
+    border-radius: 50%; background: var(--accent); opacity: .85;
+  }
+  .radius-map .dot.d1 { top: 30%; left: 26%; animation: dotPulse 2s infinite; }
+  .radius-map .dot.d2 { top: 68%; left: 32%; animation: dotPulse 2.4s infinite; }
+  .radius-map .dot.d3 { top: 36%; left: 70%; animation: dotPulse 2.8s infinite; }
+  .radius-map .dot.d4 { top: 62%; left: 64%; animation: dotPulse 3s infinite; }
+  @keyframes dotPulse {
+    0%, 100% { transform: scale(1); opacity: .85; }
+    50% { transform: scale(1.6); opacity: .4; }
+  }
+  .radius-map .radius-label {
+    position: absolute; bottom: 14px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px; color: var(--accent); font-weight: 700;
+    background: var(--accent-soft); padding: 6px 14px; border-radius: 100px;
+    white-space: nowrap; z-index: 3;
+    backdrop-filter: blur(6px);
+  }
+  .radius-map .count-badge {
+    position: absolute; top: 14px; left: 14px;
+    font-size: 12px; color: var(--text); font-weight: 600;
+    background: var(--card); padding: 6px 12px; border-radius: 100px;
+    border: 1px solid var(--border); z-index: 3;
+  }
+
+  .radius-slider-card {
+    background: var(--card); border-radius: 22px; padding: 18px 18px 16px;
+    margin-bottom: 12px; border: 1px solid var(--border);
+    transition: background .35s, border-color .35s;
+  }
+  .radius-slider-card .row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+  }
+  .radius-slider-card .label { font-size: 14px; font-weight: 700; }
+  .radius-slider-card .value {
+    font-size: 15px; color: var(--accent); font-weight: 800;
+    background: var(--accent-soft); padding: 5px 12px; border-radius: 100px;
+  }
+  input[type="range"] {
+    width: 100%; -webkit-appearance: none; appearance: none;
+    height: 6px; border-radius: 100px;
+    background: var(--chip); outline: none; cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--accent); border: 3px solid var(--card);
+    box-shadow: 0 2px 8px rgba(0,0,0,.4); cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--accent); border: 3px solid var(--card);
+    box-shadow: 0 2px 8px rgba(0,0,0,.4); cursor: pointer;
+  }
+  .radius-scale {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--text-muted); margin-top: 8px;
+  }
+
+  .toggle-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-row .t-label { font-size: 14px; font-weight: 600; }
+  .toggle-row .t-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .toggle {
+    width: 46px; height: 26px; border-radius: 100px;
+    background: var(--chip); position: relative;
+    cursor: pointer; transition: background .25s; flex-shrink: 0;
+  }
+  .toggle::after {
+    content: ""; position: absolute;
+    top: 3px; left: 3px; width: 20px; height: 20px;
+    border-radius: 50%; background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,.3);
+    transition: transform .25s;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle.on::after { transform: translateX(20px); }
+
+  /* ===== СПИСКИ ===== */
   .list-screen {
     flex: 1; overflow-y: auto; padding: 8px 16px 16px;
     scrollbar-width: none; position: relative;
@@ -366,109 +528,7 @@
     border-radius: 100px; display: grid; place-items: center; flex-shrink: 0;
   }
 
-  .radius-screen { flex: 1; overflow-y: auto; padding: 12px 16px 20px; scrollbar-width: none; }
-  .radius-screen::-webkit-scrollbar { display: none; }
-
-  .radius-map {
-    height: 220px; border-radius: 24px;
-    background:
-      radial-gradient(circle at 50% 50%, var(--accent-soft) 0%, transparent 60%),
-      repeating-radial-gradient(circle at 50% 50%, transparent 0 40px, var(--chip) 40px 42px),
-      var(--card);
-    position: relative; overflow: hidden; margin-bottom: 16px;
-    border: 1px solid var(--border);
-  }
-  .radius-map::before {
-    content: ""; position: absolute;
-    top: 50%; left: 50%; width: 100px; height: 100px;
-    margin: -50px 0 0 -50px; border-radius: 50%;
-    border: 2px dashed var(--accent); opacity: .5;
-    animation: pulse 4s ease-out infinite;
-  }
-  .radius-map::after {
-    content: "Вы"; position: absolute; top: 50%; left: 50%;
-    width: 44px; height: 44px; margin: -22px 0 0 -22px;
-    border-radius: 50%; background: url('https://i.pravatar.cc/150?img=12') center/cover;
-    border: 3px solid var(--accent); box-shadow: 0 4px 14px var(--shadow);
-    display: grid; place-items: center;
-    font-size: 0; z-index: 2;
-  }
-  .radius-map .dot {
-    position: absolute; width: 10px; height: 10px;
-    border-radius: 50%; background: var(--accent); opacity: .85;
-  }
-  .radius-map .dot.d1 { top: 30%; left: 26%; animation: dotPulse 2s infinite; }
-  .radius-map .dot.d2 { top: 68%; left: 32%; animation: dotPulse 2.4s infinite; }
-  .radius-map .dot.d3 { top: 36%; left: 70%; animation: dotPulse 2.8s infinite; }
-  .radius-map .dot.d4 { top: 62%; left: 64%; animation: dotPulse 3s infinite; }
-  @keyframes dotPulse {
-    0%, 100% { transform: scale(1); opacity: .85; }
-    50% { transform: scale(1.6); opacity: .4; }
-  }
-  .radius-map .radius-label {
-    position: absolute; bottom: 14px; left: 50%;
-    transform: translateX(-50%);
-    font-size: 12px; color: var(--accent); font-weight: 600;
-    background: var(--accent-soft); padding: 5px 12px; border-radius: 100px;
-    white-space: nowrap;
-  }
-
-  .radius-slider-card {
-    background: var(--card); border-radius: 20px; padding: 16px 18px;
-    margin-bottom: 14px; border: 1px solid var(--border);
-  }
-  .radius-slider-card .row {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 14px;
-  }
-  .radius-slider-card .label { font-size: 14px; font-weight: 600; }
-  .radius-slider-card .value {
-    font-size: 14px; color: var(--accent); font-weight: 700;
-    background: var(--accent-soft); padding: 4px 10px; border-radius: 100px;
-  }
-  input[type="range"] {
-    width: 100%; -webkit-appearance: none; appearance: none;
-    height: 6px; border-radius: 100px;
-    background: var(--chip); outline: none; cursor: pointer;
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none; appearance: none;
-    width: 22px; height: 22px; border-radius: 50%;
-    background: var(--accent); border: 3px solid var(--card);
-    box-shadow: 0 2px 8px rgba(0,0,0,.4); cursor: pointer;
-  }
-  input[type="range"]::-moz-range-thumb {
-    width: 22px; height: 22px; border-radius: 50%;
-    background: var(--accent); border: 3px solid var(--card);
-    box-shadow: 0 2px 8px rgba(0,0,0,.4); cursor: pointer;
-  }
-  .radius-scale {
-    display: flex; justify-content: space-between;
-    font-size: 11px; color: var(--text-muted); margin-top: 6px;
-  }
-
-  .toggle-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 14px 0; border-bottom: 1px solid var(--border);
-  }
-  .toggle-row:last-child { border-bottom: none; }
-  .toggle-row .t-label { font-size: 14px; }
-  .toggle-row .t-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-  .toggle {
-    width: 46px; height: 26px; border-radius: 100px;
-    background: var(--chip); position: relative;
-    cursor: pointer; transition: background .25s; flex-shrink: 0;
-  }
-  .toggle::after {
-    content: ""; position: absolute;
-    top: 3px; left: 3px; width: 20px; height: 20px;
-    border-radius: 50%; background: #fff;
-    box-shadow: 0 2px 6px rgba(0,0,0,.3);
-    transition: transform .25s;
-  }
-  .toggle.on { background: var(--accent); }
-  .toggle.on::after { transform: translateX(20px); }
-
+  /* ===== ПРОФИЛЬ ===== */
   .profile-screen { flex: 1; overflow-y: auto; padding: 12px 16px 20px; scrollbar-width: none; }
   .profile-screen::-webkit-scrollbar { display: none; }
 
@@ -530,6 +590,7 @@
   .menu-txt { flex: 1; font-size: 14px; }
   .menu-chev { color: var(--text-muted); font-size: 16px; }
 
+  /* ===== ЧАТ ===== */
   .chat-screen { flex: 1; display: flex; flex-direction: column; min-height: 0; }
   .chat-body {
     flex: 1; overflow-y: auto; padding: 12px 16px;
@@ -587,6 +648,7 @@
   }
   .chat-input .send-btn:active { transform: scale(.9); }
 
+  /* ===== РЕДАКТИРОВАНИЕ ===== */
   .edit-screen { flex: 1; overflow-y: auto; padding: 12px 16px 20px; scrollbar-width: none; }
   .edit-screen::-webkit-scrollbar { display: none; }
   .edit-avatar-block {
@@ -650,9 +712,10 @@
   }
   .save-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+  /* ===== ТАББАР ===== */
   .tabbar {
-    display: flex; justify-content: space-between;
-    padding: 8px 4px 6px;
+    display: flex; justify-content: space-around;
+    padding: 8px 8px 6px;
     border-top: 1px solid var(--border);
     background: var(--bg);
     transition: background .35s, border-color .35s;
@@ -660,29 +723,30 @@
   }
   .tab {
     display: flex; flex-direction: column; align-items: center; gap: 3px;
-    font-size: 9px; color: var(--text-muted);
-    cursor: pointer; padding: 5px 6px;
+    font-size: 10px; color: var(--text-muted);
+    cursor: pointer; padding: 5px 10px;
     border-radius: 12px;
     transition: color .2s, background .2s, transform .15s;
-    user-select: none; position: relative; flex: 1; min-width: 0;
+    user-select: none; position: relative;
+    min-width: 0;
   }
   .tab:active { transform: scale(.94); }
-  .tab .ico { font-size: 18px; line-height: 1; transition: transform .2s; }
+  .tab .ico { font-size: 20px; line-height: 1; transition: transform .2s; }
   .tab .lbl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
   .tab.active { color: var(--accent); }
   .tab.active .ico { transform: translateY(-1px) scale(1.1); }
   .tab.active::before {
     content: ""; position: absolute;
     top: -6px; left: 50%; transform: translateX(-50%);
-    width: 18px; height: 3px; border-radius: 0 0 4px 4px;
+    width: 20px; height: 3px; border-radius: 0 0 4px 4px;
     background: var(--accent); animation: indicator .25s ease;
   }
   @keyframes indicator {
     from { width: 0; opacity: 0; }
-    to { width: 18px; opacity: 1; }
+    to { width: 20px; opacity: 1; }
   }
   .tab .counter {
-    position: absolute; top: 0; right: 8px;
+    position: absolute; top: 0; right: 6px;
     background: var(--accent); color: #fff;
     font-size: 8px; font-weight: 700;
     min-width: 14px; height: 14px; padding: 0 3px;
@@ -704,7 +768,7 @@
   <div class="header" id="header">
     <div class="back-btn" id="backBtn" style="display:none;">←</div>
     <div style="flex:1; min-width:0;">
-      <h1 id="screenTitle">Рядом <span>●</span></h1>
+      <h1 id="screenTitle">Поиск <span>●</span></h1>
       <div class="chat-title" id="chatTitle">
         <div class="nm" id="chatTitleName"></div>
         <div class="st" id="chatTitleStatus"></div>
@@ -713,38 +777,72 @@
     <div class="icon-btn" id="themeBtn" title="Тема">⚙️</div>
   </div>
 
-  <!-- 1. ПОИСК -->
+  <!-- ================= 1. ПОИСК ================= -->
   <div class="screen active" id="screen-search">
-    <div class="radar">
-      <div class="pulse"></div><div class="pulse"></div><div class="pulse"></div>
-      <div class="me"></div>
-      <div class="friend-wrap f1"><div class="friend" data-name="Аня, 24" data-age="24" data-dist="1.2 км" data-tags="☕ кофе|🏔 горы|🎧 музыка" style="background-image:url('https://i.pravatar.cc/150?img=47')"><span class="online"></span></div></div>
-      <div class="friend-wrap f2"><div class="friend" data-name="Мария, 26" data-age="26" data-dist="2.4 км" data-tags="📚 книги|🍷 вино|🐱 коты" style="background-image:url('https://i.pravatar.cc/150?img=32')"></div></div>
-      <div class="friend-wrap f3"><div class="friend" data-name="Оля, 22" data-age="22" data-dist="0.8 км" data-tags="🎬 кино|🏃 спорт|🌮 еда" style="background-image:url('https://i.pravatar.cc/150?img=45')"><span class="online"></span></div></div>
-      <div class="friend-wrap f4"><div class="friend" data-name="Катя, 25" data-age="25" data-dist="3.1 км" data-tags="✈️ путешествия|📷 фото|🎨 арт" style="background-image:url('https://i.pravatar.cc/150?img=16')"></div></div>
-      <div class="friend-wrap f5"><div class="friend" data-name="Ира, 23" data-age="23" data-dist="1.7 км" data-tags="🎵 музыка|🧘 йога|☕ кофе" style="background-image:url('https://i.pravatar.cc/150?img=49')"></div></div>
-      <div class="friend-wrap f6"><div class="friend" data-name="Даша, 27" data-age="27" data-dist="4.0 км" data-tags="🐶 собаки|🌿 природа|🍳 готовка" style="background-image:url('https://i.pravatar.cc/150?img=20')"></div></div>
+    <div class="search-switcher-wrap">
+      <div class="search-switcher" id="searchSwitcher">
+        <div class="indicator"></div>
+        <button class="active" data-mode="radius"><span class="ico">🗺</span>Рядом</button>
+        <button data-mode="radar"><span class="ico">🎯</span>Радар</button>
+      </div>
     </div>
 
-    <div class="card-zone" id="cardZone">
-      <div class="bottom-card" id="card">
-        <div class="swipe-label like" id="labelLike">LIKE</div>
-        <div class="swipe-label nope" id="labelNope">NOPE</div>
-        <div class="info-row">
-          <div class="name"><span id="card-name">Аня</span> <span id="card-age">24</span></div>
-          <div class="distance" id="card-dist">📍 1.2 км</div>
+    <!-- ПАНЕЛЬ: РАДАР (аватары) — активна по умолчанию, соответствует кнопке «Рядом» -->
+    <div class="mode-pane active" id="pane-radar">
+      <div class="radar">
+        <div class="pulse"></div><div class="pulse"></div><div class="pulse"></div>
+        <div class="me"></div>
+        <div class="friend-wrap f1"><div class="friend" data-name="Аня, 24" data-age="24" data-dist="1.2 км" data-tags="☕ кофе|🏔 горы|🎧 музыка" style="background-image:url('https://i.pravatar.cc/150?img=47')"><span class="online"></span></div></div>
+        <div class="friend-wrap f2"><div class="friend" data-name="Мария, 26" data-age="26" data-dist="2.4 км" data-tags="📚 книги|🍷 вино|🐱 коты" style="background-image:url('https://i.pravatar.cc/150?img=32')"></div></div>
+        <div class="friend-wrap f3"><div class="friend" data-name="Оля, 22" data-age="22" data-dist="0.8 км" data-tags="🎬 кино|🏃 спорт|🌮 еда" style="background-image:url('https://i.pravatar.cc/150?img=45')"><span class="online"></span></div></div>
+        <div class="friend-wrap f4"><div class="friend" data-name="Катя, 25" data-age="25" data-dist="3.1 км" data-tags="✈️ путешествия|📷 фото|🎨 арт" style="background-image:url('https://i.pravatar.cc/150?img=16')"></div></div>
+        <div class="friend-wrap f5"><div class="friend" data-name="Ира, 23" data-age="23" data-dist="1.7 км" data-tags="🎵 музыка|🧘 йога|☕ кофе" style="background-image:url('https://i.pravatar.cc/150?img=49')"></div></div>
+        <div class="friend-wrap f6"><div class="friend" data-name="Даша, 27" data-age="27" data-dist="4.0 км" data-tags="🐶 собаки|🌿 природа|🍳 готовка" style="background-image:url('https://i.pravatar.cc/150?img=20')"></div></div>
+      </div>
+
+      <div class="card-zone" id="cardZone">
+        <div class="bottom-card" id="card">
+          <div class="swipe-label like" id="labelLike">LIKE</div>
+          <div class="swipe-label nope" id="labelNope">NOPE</div>
+          <div class="info-row">
+            <div class="name"><span id="card-name">Аня</span> <span id="card-age">24</span></div>
+            <div class="distance" id="card-dist">📍 1.2 км</div>
+          </div>
+          <div class="tags" id="card-tags"><span class="tag">☕ кофе</span><span class="tag">🏔 горы</span><span class="tag">🎧 музыка</span></div>
+          <div class="actions">
+            <div class="action skip" id="btnSkip">✕</div>
+            <div class="action like" id="btnLike">❤</div>
+            <div class="action star" id="btnStar">⭐</div>
+          </div>
         </div>
-        <div class="tags" id="card-tags"><span class="tag">☕ кофе</span><span class="tag">🏔 горы</span><span class="tag">🎧 музыка</span></div>
-        <div class="actions">
-          <div class="action skip" id="btnSkip">✕</div>
-          <div class="action like" id="btnLike">❤</div>
-          <div class="action star" id="btnStar">⭐</div>
+      </div>
+    </div>
+
+    <!-- ПАНЕЛЬ: КАРТА / РАДИУС — соответствует кнопке «Радар» -->
+    <div class="mode-pane" id="pane-radius">
+      <div class="radius-pane">
+        <div class="radius-map">
+          <div class="count-badge" id="radiusCount">👥 24 человека рядом</div>
+          <div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div><div class="dot d4"></div>
+          <div class="radius-label" id="radiusMapLabel">Радиус 25 км</div>
+        </div>
+
+        <div class="radius-slider-card">
+          <div class="row"><div class="label">Радиус поиска</div><div class="value" id="radiusValue">25 км</div></div>
+          <input type="range" id="radiusRange" min="1" max="100" value="25">
+          <div class="radius-scale"><span>1 км</span><span>50 км</span><span>100 км</span></div>
+        </div>
+
+        <div class="radius-slider-card">
+          <div class="toggle-row"><div><div class="t-label">Только онлайн</div><div class="t-sub">Показывать тех, кто сейчас в сети</div></div><div class="toggle" data-toggle></div></div>
+          <div class="toggle-row"><div><div class="t-label">Только с фото</div><div class="t-sub">Скрыть профили без фотографии</div></div><div class="toggle on" data-toggle></div></div>
+          <div class="toggle-row"><div><div class="t-label">Расширенный поиск</div><div class="t-sub">Учитывать интересы и цели</div></div><div class="toggle" data-toggle></div></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 2. ГОСТИ -->
+  <!-- ================= 2. ГОСТИ ================= -->
   <div class="screen" id="screen-guests">
     <div class="list-screen" id="guestsScroll">
       <div class="ptr" id="guestsPtr"><div class="spinner"></div><span>Потяните для обновления</span></div>
@@ -753,12 +851,12 @@
     </div>
   </div>
 
-  <!-- 3. ДРУЗЬЯ -->
+  <!-- ================= 3. ДРУЗЬЯ ================= -->
   <div class="screen" id="screen-friends">
     <div class="friends-grid" id="friendsGrid"></div>
   </div>
 
-  <!-- 4. ЧАТЫ -->
+  <!-- ================= 4. ЧАТЫ ================= -->
   <div class="screen" id="screen-messages">
     <div class="list-screen" id="chatsScroll">
       <div class="ptr" id="chatsPtr"><div class="spinner"></div><span>Потяните для обновления</span></div>
@@ -767,27 +865,7 @@
     </div>
   </div>
 
-  <!-- 5. РЯДОМ -->
-  <div class="screen" id="screen-radius">
-    <div class="radius-screen">
-      <div class="radius-map">
-        <div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div><div class="dot d4"></div>
-        <div class="radius-label" id="radiusMapLabel">Рядом: 25 км</div>
-      </div>
-      <div class="radius-slider-card">
-        <div class="row"><div class="label">Радиус поиска</div><div class="value" id="radiusValue">25 км</div></div>
-        <input type="range" id="radiusRange" min="1" max="100" value="25">
-        <div class="radius-scale"><span>1 км</span><span>50 км</span><span>100 км</span></div>
-      </div>
-      <div class="radius-slider-card">
-        <div class="toggle-row"><div><div class="t-label">Только онлайн</div><div class="t-sub">Показывать тех, кто сейчас в сети</div></div><div class="toggle" data-toggle></div></div>
-        <div class="toggle-row"><div><div class="t-label">Только с фото</div><div class="t-sub">Скрыть профили без фотографии</div></div><div class="toggle on" data-toggle></div></div>
-        <div class="toggle-row"><div><div class="t-label">Расширенный поиск</div><div class="t-sub">Учитывать интересы и цели</div></div><div class="toggle" data-toggle></div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 6. ПРОФИЛЬ -->
+  <!-- ================= 5. ПРОФИЛЬ ================= -->
   <div class="screen" id="screen-profile">
     <div class="profile-screen">
       <div class="profile-hero" id="profileHero">
@@ -811,7 +889,7 @@
     </div>
   </div>
 
-  <!-- 7. ЧАТ -->
+  <!-- ================= 6. ЧАТ ================= -->
   <div class="screen" id="screen-chat">
     <div class="chat-screen">
       <div class="chat-body" id="chatBody"></div>
@@ -822,7 +900,7 @@
     </div>
   </div>
 
-  <!-- 8. РЕДАКТИРОВАТЬ -->
+  <!-- ================= 7. РЕДАКТИРОВАНИЕ ================= -->
   <div class="screen" id="screen-edit">
     <div class="edit-screen">
       <div class="edit-avatar-block">
@@ -844,12 +922,12 @@
 
   <div class="save-toast" id="saveToast">✅ Профиль сохранён</div>
 
+  <!-- ================= ТАББАР ================= -->
   <div class="tabbar" id="tabbar">
     <div class="tab active" data-screen="search"><span class="ico">🔍</span><span class="lbl">Поиск</span></div>
     <div class="tab" data-screen="guests"><span class="ico">👀</span><span class="lbl">Гости</span><span class="counter" id="guestsCounter">3</span></div>
     <div class="tab" data-screen="friends"><span class="ico">👥</span><span class="lbl">Друзья</span></div>
     <div class="tab" data-screen="messages"><span class="ico">💬</span><span class="lbl">Чаты</span><span class="counter" id="msgCounter">2</span></div>
-    <div class="tab" data-screen="radius"><span class="ico">📡</span><span class="lbl">Рядом</span></div>
     <div class="tab" data-screen="profile"><span class="ico">👤</span><span class="lbl">Профиль</span></div>
   </div>
 
@@ -859,22 +937,24 @@
 document.addEventListener('DOMContentLoaded', () => {
   'use strict';
 
-  /* ============ УТИЛИТЫ ============ */
+  const safeStore = {
+    get(key, fallback) { try { return localStorage.getItem(key) ?? fallback; } catch(e) { return fallback; } },
+    set(key, value) { try { localStorage.setItem(key, value); } catch(e) {} }
+  };
+
   function vibrate(pattern = 12) {
-    if ('vibrate' in navigator) {
-      try { navigator.vibrate(pattern); } catch(e) {}
-    }
+    if ('vibrate' in navigator) { try { navigator.vibrate(pattern); } catch(e) {} }
   }
   function $(id) { return document.getElementById(id); }
 
-  /* ============ ДАННЫЕ ============ */
+  /* ===== ДАННЫЕ ===== */
   const deck = [
-    { name: 'Аня',   age: 24, dist: '1.2 км', tags: ['☕ кофе', '🏔 горы', '🎧 музыка'],   img: 'https://i.pravatar.cc/150?img=47' },
-    { name: 'Мария', age: 26, dist: '2.4 км', tags: ['📚 книги', '🍷 вино', '🐱 коты'],   img: 'https://i.pravatar.cc/150?img=32' },
-    { name: 'Оля',   age: 22, dist: '0.8 км', tags: ['🎬 кино', '🏃 спорт', '🌮 еда'],    img: 'https://i.pravatar.cc/150?img=45' },
-    { name: 'Катя',  age: 25, dist: '3.1 км', tags: ['✈️ путешествия', '📷 фото', '🎨 арт'], img: 'https://i.pravatar.cc/150?img=16' },
-    { name: 'Ира',   age: 23, dist: '1.7 км', tags: ['🎵 музыка', '🧘 йога', '☕ кофе'],  img: 'https://i.pravatar.cc/150?img=49' },
-    { name: 'Даша',  age: 27, dist: '4.0 км', tags: ['🐶 собаки', '🌿 природа', '🍳 готовка'], img: 'https://i.pravatar.cc/150?img=20' },
+    { name: 'Аня',   age: 24, dist: '1.2 км', tags: ['☕ кофе', '🏔 горы', '🎧 музыка'] },
+    { name: 'Мария', age: 26, dist: '2.4 км', tags: ['📚 книги', '🍷 вино', '🐱 коты'] },
+    { name: 'Оля',   age: 22, dist: '0.8 км', tags: ['🎬 кино', '🏃 спорт', '🌮 еда'] },
+    { name: 'Катя',  age: 25, dist: '3.1 км', tags: ['✈️ путешествия', '📷 фото', '🎨 арт'] },
+    { name: 'Ира',   age: 23, dist: '1.7 км', tags: ['🎵 музыка', '🧘 йога', '☕ кофе'] },
+    { name: 'Даша',  age: 27, dist: '4.0 км', tags: ['🐶 собаки', '🌿 природа', '🍳 готовка'] },
   ];
   let deckIndex = 0;
 
@@ -911,18 +991,18 @@ document.addEventListener('DOMContentLoaded', () => {
     'Ира':   [{ from: 'me', text: 'Ок, увидимся', time: 'Пн' }],
   };
 
-  let profile = JSON.parse(localStorage.getItem('dating-profile') || 'null') || {
-    name: 'Максим', age: 28, city: 'Берлин', about: 'Люблю кофе, горы и хорошие разговоры.'
-  };
+  let profile;
+  try { profile = JSON.parse(safeStore.get('dating-profile', 'null')); } catch(e) { profile = null; }
+  profile = profile || { name: 'Максим', age: 28, city: 'Берлин', about: 'Люблю кофе, горы и хорошие разговоры.' };
 
-  /* ============ ССЫЛКИ НА DOM ============ */
-  const tabbar        = $('tabbar');
-  const backBtn       = $('backBtn');
-  const screenTitle   = $('screenTitle');
-  const chatTitle     = $('chatTitle');
+  /* ===== DOM ===== */
+  const tabbar = $('tabbar');
+  const backBtn = $('backBtn');
+  const screenTitle = $('screenTitle');
+  const chatTitle = $('chatTitle');
   const chatTitleName = $('chatTitleName');
   const chatTitleStatus = $('chatTitleStatus');
-  const themeBtn      = $('themeBtn');
+  const themeBtn = $('themeBtn');
 
   const tabs = document.querySelectorAll('.tab');
   const screens = {
@@ -930,27 +1010,24 @@ document.addEventListener('DOMContentLoaded', () => {
     guests:   $('screen-guests'),
     friends:  $('screen-friends'),
     messages: $('screen-messages'),
-    radius:   $('screen-radius'),
     profile:  $('screen-profile'),
     chat:     $('screen-chat'),
     edit:     $('screen-edit'),
   };
   const titles = {
-    search: 'Рядом <span>●</span>',
+    search: 'Поиск <span>●</span>',
     guests: 'Гости',
     friends: 'Друзья',
     messages: 'Чаты',
-    radius: 'Рядом',
     profile: 'Профиль',
   };
 
   let previousScreen = 'messages';
 
-  /* ============ НАВИГАЦИЯ ============ */
+  /* ===== НАВИГАЦИЯ ===== */
   function showScreen(target) {
     Object.values(screens).forEach(s => s.classList.remove('active'));
     if (screens[target]) screens[target].classList.add('active');
-
     tabs.forEach(t => t.classList.toggle('active', t.dataset.screen === target));
 
     if (target === 'chat' || target === 'edit') {
@@ -973,10 +1050,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const target = tab.dataset.screen;
       showScreen(target);
       if (target === 'guests') {
-        setTimeout(() => {
-          guests.forEach(g => g.isNew = false);
-          renderGuests();
-        }, 1200);
+        setTimeout(() => { guests.forEach(g => g.isNew = false); renderGuests(); }, 1200);
       }
     });
   });
@@ -986,7 +1060,34 @@ document.addEventListener('DOMContentLoaded', () => {
     showScreen(previousScreen);
   });
 
-  /* ============ РЕНДЕР ГОСТЕЙ ============ */
+  /* ===== ПЕРЕКЛЮЧАТЕЛЬ РЯДОМ/РАДАР ===== */
+  const searchSwitcher = $('searchSwitcher');
+  const paneRadar = $('pane-radar');
+  const paneRadius = $('pane-radius');
+  const switcherButtons = searchSwitcher.querySelectorAll('button');
+
+  switcherButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.mode;
+      if (btn.classList.contains('active')) return;
+
+      vibrate(10);
+
+      switcherButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      /* Индикатор уезжает вправо, когда активна правая кнопка «Радар» */
+      searchSwitcher.classList.toggle('mode-radar', mode === 'radar');
+
+      /* Функционал переставлен:
+         «Рядом» (слева)  → показывает РАДАР (аватары)
+         «Радар» (справа) → показывает КАРТУ (радиус) */
+      paneRadar.classList.toggle('active', mode === 'radius');
+      paneRadius.classList.toggle('active', mode === 'radar');
+    });
+  });
+
+  /* ===== РЕНДЕР ГОСТЕЙ ===== */
   function renderGuests() {
     const wrap = $('guestsList');
     if (!wrap) return;
@@ -1019,7 +1120,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /* ============ РЕНДЕР ДРУЗЕЙ ============ */
   function renderFriends() {
     const grid = $('friendsGrid');
     if (!grid) return;
@@ -1046,7 +1146,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* ============ РЕНДЕР ЧАТОВ ============ */
   function renderChats() {
     const wrap = $('chatsList');
     if (!wrap) return;
@@ -1067,10 +1166,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         ${c.unread ? `<span class="unread-badge">${c.unread}</span>` : ''}
       `;
-      row.addEventListener('click', () => {
-        vibrate(10);
-        openChat(c);
-      });
+      row.addEventListener('click', () => { vibrate(10); openChat(c); });
       wrap.appendChild(row);
     });
     const totalUnread = chats.reduce((s, c) => s + c.unread, 0);
@@ -1085,19 +1181,19 @@ document.addEventListener('DOMContentLoaded', () => {
   renderFriends();
   renderChats();
 
-  /* ============ КАРТОЧКА ============ */
-  const card      = $('card');
-  const cardName  = $('card-name');
-  const cardAge   = $('card-age');
-  const cardDist  = $('card-dist');
-  const cardTags  = $('card-tags');
+  /* ===== КАРТОЧКА ===== */
+  const card = $('card');
+  const cardName = $('card-name');
+  const cardAge = $('card-age');
+  const cardDist = $('card-dist');
+  const cardTags = $('card-tags');
   const labelLike = $('labelLike');
   const labelNope = $('labelNope');
   const friendsEls = document.querySelectorAll('.friend');
 
   function renderCard(person) {
     cardName.textContent = person.name;
-    cardAge.textContent  = person.age;
+    cardAge.textContent = person.age;
     cardDist.textContent = '📍 ' + person.dist;
     cardTags.innerHTML = '';
     person.tags.forEach(t => {
@@ -1123,12 +1219,11 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => friend.classList.remove('bounce'), 500);
 
       const name = friend.dataset.name.split(',')[0].trim();
-      const age  = +friend.dataset.age;
+      const age = +friend.dataset.age;
       const dist = friend.dataset.dist;
       const tags = friend.dataset.tags.split('|');
 
       renderCard({ name, age, dist, tags });
-
       const idx = deck.findIndex(p => p.name === name);
       if (idx !== -1) deckIndex = idx;
 
@@ -1208,14 +1303,17 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => card.classList.remove('flash'), 250);
   });
 
-  /* ============ РЯДОМ ============ */
-  const radiusRange    = $('radiusRange');
-  const radiusValue    = $('radiusValue');
+  /* ===== РЯДОМ (слайдер + тогглы) ===== */
+  const radiusRange = $('radiusRange');
+  const radiusValue = $('radiusValue');
   const radiusMapLabel = $('radiusMapLabel');
+  const radiusCount = $('radiusCount');
   radiusRange.addEventListener('input', () => {
     const v = radiusRange.value;
     radiusValue.textContent = v + ' км';
-    radiusMapLabel.textContent = 'Рядом: ' + v + ' км';
+    radiusMapLabel.textContent = 'Радиус ' + v + ' км';
+    const count = Math.max(1, Math.round(100 - v * 0.8));
+    radiusCount.textContent = '👥 ' + count + ' человек рядом';
   });
   radiusRange.addEventListener('change', () => vibrate(6));
 
@@ -1226,11 +1324,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  /* ============ ЧАТ ============ */
+  /* ===== ЧАТ ===== */
   let currentChat = null;
-  const chatBody  = $('chatBody');
+  const chatBody = $('chatBody');
   const chatInput = $('chatInput');
-  const sendBtn   = $('sendBtn');
+  const sendBtn = $('sendBtn');
 
   function openChat(chat) {
     currentChat = chat;
@@ -1273,7 +1371,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!messageHistory[currentChat.name]) messageHistory[currentChat.name] = [];
     messageHistory[currentChat.name].push({ from: 'me', text, time });
-
     currentChat.last = text;
     currentChat.time = time;
 
@@ -1308,27 +1405,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   sendBtn.addEventListener('click', sendMessage);
-  chatInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') sendMessage();
-  });
+  chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(); });
 
-  /* ============ ПРОФИЛЬ / РЕДАКТИРОВАНИЕ ============ */
-  const editName    = $('editName');
-  const editAge     = $('editAge');
-  const editCity    = $('editCity');
-  const editAbout   = $('editAbout');
+  /* ===== ПРОФИЛЬ ===== */
+  const editName = $('editName');
+  const editAge = $('editAge');
+  const editCity = $('editCity');
+  const editAbout = $('editAbout');
   const profileName = $('profileName');
   const profileMeta = $('profileMeta');
-  const saveToast   = $('saveToast');
+  const saveToast = $('saveToast');
 
   function fillProfileUI() {
     profileName.textContent = `${profile.name}, ${profile.age}`;
     profileMeta.textContent = `📍 ${profile.city} · 5 км`;
   }
   function fillEditForm() {
-    editName.value  = profile.name;
-    editAge.value   = profile.age;
-    editCity.value  = profile.city;
+    editName.value = profile.name;
+    editAge.value = profile.age;
+    editCity.value = profile.city;
     editAbout.value = profile.about;
   }
   fillProfileUI();
@@ -1347,12 +1442,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   $('saveEdit').addEventListener('click', () => {
     vibrate([10, 20, 10]);
-    profile.name  = editName.value.trim() || 'Пользователь';
-    profile.age   = +editAge.value || 18;
-    profile.city  = editCity.value.trim() || 'Город';
+    profile.name = editName.value.trim() || 'Пользователь';
+    profile.age = +editAge.value || 18;
+    profile.city = editCity.value.trim() || 'Город';
     profile.about = editAbout.value.trim();
 
-    localStorage.setItem('dating-profile', JSON.stringify(profile));
+    safeStore.set('dating-profile', JSON.stringify(profile));
     fillProfileUI();
     showScreen('profile');
 
@@ -1360,7 +1455,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => saveToast.classList.remove('show'), 1800);
   });
 
-  /* ============ PULL-TO-REFRESH ============ */
+  /* ===== PULL-TO-REFRESH ===== */
   function setupPullToRefresh(scrollEl, ptrEl, onRefresh) {
     if (!scrollEl || !ptrEl) return;
     let startY = 0, pulling = false, dist = 0;
@@ -1448,23 +1543,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  /* ============ ТЕМА ============ */
+  /* ===== ТЕМА ===== */
   const THEME_KEY = 'dating-theme';
   function applyTheme(theme) {
     document.body.classList.toggle('light', theme === 'light');
     themeBtn.textContent = theme === 'light' ? '🌙' : '⚙️';
   }
-  const savedTheme = localStorage.getItem(THEME_KEY);
+  const savedTheme = safeStore.get(THEME_KEY, 'dark');
   if (savedTheme === 'light') applyTheme('light');
 
   themeBtn.addEventListener('click', () => {
     vibrate(8);
     const isLight = document.body.classList.toggle('light');
-    localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark');
+    safeStore.set(THEME_KEY, isLight ? 'light' : 'dark');
     themeBtn.textContent = isLight ? '🌙' : '⚙️';
   });
 
-  console.log('✅ app ready: все обработчики навешены');
+  console.log('✅ app ready');
 });
 </script>
 
